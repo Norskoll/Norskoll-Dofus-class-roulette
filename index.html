@@ -54,9 +54,6 @@ body{
   grid-template-columns: 1.2fr .8fr;
   gap:18px;
 }
-@media (max-width: 980px){
-  .grid{grid-template-columns:1fr}
-}
 .panel{
   border-radius:14px;
   padding:14px;
@@ -82,11 +79,9 @@ body{
 }
 .wheelWrap{
   display:grid;
-  grid-template-columns:1fr 240px;
+  grid-template-columns:1fr 260px;
   gap:16px;
-}
-@media (max-width: 640px){
-  .wheelWrap{grid-template-columns:1fr}
+  align-items:start;
 }
 .wheelBox{
   position:relative;
@@ -216,6 +211,25 @@ button:disabled{opacity:.55; cursor:not-allowed}
 }
 .banItem.banned{opacity:.55}
 .banItem.banned button{background:linear-gradient(180deg,#4bc77f,#1a6b3f)}
+
+@media (max-width: 980px){
+  .grid{grid-template-columns:1fr}
+  .wheelWrap{grid-template-columns:1fr}
+}
+
+@media (max-width: 600px){
+  body{display:block}
+  .frame{padding:14px; margin:14px auto; width:min(980px,96vw)}
+  .pageTitle{margin-bottom:16px}
+  .pageTitle h1{font-size:20px; letter-spacing:1.1px}
+  .panel{padding:12px}
+  .wheelBox{width:min(92vw, 520px)}
+  .miniWheel{width:190px; height:190px}
+  button{padding:12px 14px; font-size:16px}
+  .toggles{font-size:13px}
+  .result .value{font-size:18px}
+  .banList{max-height:none}
+}
 </style>
 </head>
 
@@ -466,7 +480,6 @@ renderBanList();
 spin19Btn.addEventListener("click", ()=>{
   lock(true);
   ensureAudio();
-
   spinWheel({
     canvasEl: wheel19,
     labels: CLASSES,
@@ -493,7 +506,6 @@ spin19Btn.addEventListener("click", ()=>{
 spin4Btn.addEventListener("click", ()=>{
   lock(true);
   ensureAudio();
-
   spinWheel({
     canvasEl: wheel4,
     labels: ELEMENTS,
