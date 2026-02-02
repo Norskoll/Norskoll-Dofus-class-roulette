@@ -229,7 +229,59 @@ button:disabled{opacity:.55; cursor:not-allowed}
   .toggles{font-size:13px}
   .result .value{font-size:18px}
   .banList{max-height:none}
+}/* ===== MOBILE FIX – DO NOT TOUCH ABOVE ===== */
+@media (max-width:600px){
+
+  body{
+    display:block;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .frame{
+    padding:14px;
+    margin:12px auto;
+  }
+
+  .pageTitle h1{
+    font-size:20px;
+    line-height:1.25;
+  }
+
+  .wheelBox{
+    width:88vw;
+    max-width:420px;
+    margin:0 auto 12px auto;
+  }
+
+  #spin19{
+    position:sticky;
+    top:8px;
+    z-index:10;
+    font-size:18px;
+    padding:14px;
+  }
+
+  .result{
+    margin-top:14px;
+  }
+
+  .result .value{
+    font-size:20px;
+  }
+
+  .miniWheel{
+    width:180px;
+    height:180px;
+    margin:20px auto 10px auto;
+  }
+
+  button{
+    font-size:16px;
+    padding:14px;
+  }
+
 }
+
 </style>
 </head>
 
