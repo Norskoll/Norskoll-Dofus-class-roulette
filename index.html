@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Norskoll — Class & Element Roulette</title>
+
+<style>
+:root{
+  --bg:#0b0a08;
+  --gold1:#d7b25b;
+  --gold2:#8b6a2b;
+  --ink:#f3e8d1;
+  --muted:#9c8b6b;
+  --danger:#b02020;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  background:
+    radial-gradient(1200px 800px at 50% 35%, #16120c 0%, var(--bg) 60%),
+    linear-gradient(180deg, #0b0a08 0%, #060504 100%);
+  color:var(--ink);
+  font-family: system-ui, Segoe UI, Arial, sans-serif;
+}
+.frame{
+  width:min(1200px,96vw);
+  margin:26px 0;
+  border-radius:18px;
+  padding:20px;
+  background: linear-gradient(180deg, rgba(42,34,22,.95), rgba(18,14,9,.95));
+  border:1px solid rgba(215,178,91,.25);
+  box-shadow:0 40px 90px rgba(0,0,0,.65);
+}
+.pageTitle{
+  text-align:center;
+  margin-bottom:24px;
+  padding-bottom:14px;
+  border-bottom:1px solid rgba(215,178,91,.25);
+}
+.pageTitle h1{
+  margin:0;
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:1.4px;
+  color:var(--gold1);
+  text-shadow: 0 2px 0 rgba(0,0,0,.7), 0 12px 40px rgba(0,0,0,.9);
+}
+.grid{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap:18px;
+}
+@media (max-width: 980px){
+  .grid{grid-template-columns:1fr}
+}
+.panel{
+  border-radius:14px;
+  padding:14px;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(215,178,91,.18);
+}
+.title{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  margin-bottom:10px;
+  gap:10px;
+}
+.title h2{
+  margin:0;
+  font-size:15px;
+  font-weight:800;
+}
+.title span{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+.wheelWrap{
+  display:grid;
+  grid-template-columns:1fr 240px;
+  gap:16px;
+}
+@media (max-width: 640px){
+  .wheelWrap{grid-template-columns:1fr}
+}
+.wheelBox{
+  position:relative;
+  aspect-ratio:1/1;
+  width:min(560px,92vw);
+  margin:auto;
+}
+canvas{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:6px solid rgba(215,178,91,.35);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.6),0 18px 50px rgba(0,0,0,.7);
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.06), rgba(0,0,0,.35));
+  transform: rotate(0deg);
+}
+.pointer{
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-bottom:26px solid var(--danger);
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.55));
+}
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+button{
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:800;
+  cursor:pointer;
+  background:linear-gradient(180deg,var(--gold1),var(--gold2));
+  color:#1a1206;
+  box-shadow:0 10px 24px rgba(0,0,0,.35);
+}
+button:disabled{opacity:.55; cursor:not-allowed}
+.small{
+  background:linear-gradient(180deg,#cfd8dc,#8fa3ad);
+}
+.result{
+  border-radius:10px;
+  padding:10px;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(215,178,91,.18);
+}
+.result .row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:baseline;
+}
+.result .label{
+  font-size:12px;
+  color:var(--muted);
+}
+.result .value{
+  font-size:18px;
+  font-weight:900;
+}
+.toggles{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:12px;
+  color:var(--muted);
+}
+.toggles label{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  cursor:pointer;
+  user-select:none;
+}
+.miniWheel{
+  width:210px;
+  height:210px;
+  margin:auto;
+  position:relative;
+}
+.miniWheel canvas{border-width:5px}
+.miniWheel .pointer{
+  border-left-width:12px;
+  border-right-width:12px;
+  border-bottom-width:22px;
+  top:-9px;
+}
+.banList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:650px;
+  overflow:auto;
+  padding-right:6px;
+}
+.banItem{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(215,178,91,.15);
+}
+.banItem .name{
+  font-weight:900;
+  font-size:14px;
+}
+.banItem .meta{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+.banItem button{
+  background:linear-gradient(180deg,#e24b4b,#7a1414);
+  color:white;
+  font-size:12px;
+  padding:9px 12px;
+  border-radius:10px;
+}
+.banItem.banned{opacity:.55}
+.banItem.banned button{background:linear-gradient(180deg,#4bc77f,#1a6b3f)}
+</style>
+</head>
+
+<body>
+<div class="frame">
+
+<header class="pageTitle">
+  <h1>Norskoll — Class & Element Roulette</h1>
+</header>
+
+<div class="grid">
+
+  <div class="panel">
+    <div class="title">
+      <h2>Roulette DOFUS 19 classes</h2>
+      <span>Pick / Ban · Son par case</span>
+    </div>
+
+    <div class="wheelWrap">
+      <div class="wheelBox">
+        <div class="pointer"></div>
+        <canvas id="wheel19" width="840" height="840"></canvas>
+      </div>
+
+      <div class="controls">
+        <button id="spin19">Lancer (classes)</button>
+
+        <div class="toggles">
+          <label><input id="tickSound" type="checkbox" checked> sons pendant la rotation</label>
+          <label><input id="resultSound" type="checkbox" checked> son sur résultat</label>
+        </div>
+
+        <div class="result">
+          <div class="row"><div class="label">Résultat classe</div><div class="label" id="countLeft">19 dispo</div></div>
+          <div class="value" id="pickedClass">—</div>
+          <div style="height:8px"></div>
+          <div class="row"><div class="label">Résultat élément</div><div class="label">4 cases</div></div>
+          <div class="value" id="pickedElem">—</div>
+        </div>
+
+        <div class="miniWheel">
+          <div class="pointer"></div>
+          <canvas id="wheel4" width="420" height="420"></canvas>
+        </div>
+
+        <button id="spin4" class="small">Lancer (élément)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">
+      <h2>Pick / Ban</h2>
+      <span>Exclus du tirage</span>
+    </div>
+    <div class="banList" id="banList"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const CLASSES=["Crâ","Ecaflip","Eliotrope","Eniripsa","Enutrof","Féca","Forgelance","Huppermage","Iop","Osamodas","Ouginak","Pandawa","Roublard","Sacrieur","Sadida","Sram","Steamer","Xélor","Zobal"];
+const ELEMENTS=["Feu","Eau","Air","Terre"];
+
+const wheel19=document.getElementById("wheel19");
+const wheel4=document.getElementById("wheel4");
+const pickedClass=document.getElementById("pickedClass");
+const pickedElem=document.getElementById("pickedElem");
+const banList=document.getElementById("banList");
+const countLeft=document.getElementById("countLeft");
+const tickSound=document.getElementById("tickSound");
+const resultSound=document.getElementById("resultSound");
+const spin19Btn=document.getElementById("spin19");
+const spin4Btn=document.getElementById("spin4");
+
+const banned=new Set();
+let audioCtx=null;
+
+function ensureAudio(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}
+function playTone(freq, durationMs=55, type="square", gain=0.028){
+  ensureAudio();
+  const t0=audioCtx.currentTime;
+  const osc=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  osc.type=type;
+  osc.frequency.setValueAtTime(freq,t0);
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(gain,t0+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+(durationMs/1000));
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0+(durationMs/1000)+0.02);
+}
+function hashToFreq(str, base=180){
+  let h=0;
+  for(let i=0;i<str.length;i++) h=(h*31 + str.charCodeAt(i))>>>0;
+  return base + (h%680);
+}
+
+function drawWheel(canvas, labels, opts){
+  const ctx=canvas.getContext("2d");
+  const w=canvas.width, h=canvas.height;
+  const cx=w/2, cy=h/2;
+  const r=Math.min(w,h)*0.48;
+  const n=labels.length;
+  const step=(Math.PI*2)/n;
+
+  ctx.clearRect(0,0,w,h);
+
+  const bg=ctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r);
+  bg.addColorStop(0,"rgba(255,255,255,0.06)");
+  bg.addColorStop(1,"rgba(0,0,0,0.38)");
+  ctx.fillStyle=bg;
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+
+  const palette=opts?.colors ?? ["rgba(215,178,91,.90)","rgba(70,150,95,.88)","rgba(180,80,40,.84)","rgba(90,140,170,.84)"];
+  const labelScale=opts?.labelScale ?? 1.0;
+  const fontSize=Math.max(14, Math.round(r*0.075*labelScale));
+  const textColor=opts?.textColor ?? "rgba(10,7,4,.85)";
+
+  for(let i=0;i<n;i++){
+    const a0=i*step - Math.PI/2;
+    const a1=(i+1)*step - Math.PI/2;
+    const isBan = opts?.isBanned?.(i) ?? false;
+
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,a0,a1);
+    ctx.closePath();
+    ctx.fillStyle=isBan ? "rgba(120,120,120,.28)" : palette[i%palette.length];
+    ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,.55)";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate((a0+a1)/2);
+    ctx.textAlign="right";
+    ctx.fillStyle=isBan ? "rgba(240,232,210,.35)" : textColor;
+    ctx.font=`${fontSize}px system-ui, Segoe UI, Arial`;
+    ctx.fillText(labels[i], r*0.92, 6);
+    ctx.restore();
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx,cy,r*0.18,0,Math.PI*2);
+  ctx.fillStyle="rgba(0,0,0,.40)";
+  ctx.fill();
+  ctx.strokeStyle="rgba(215,178,91,.22)";
+  ctx.lineWidth=2;
+  ctx.stroke();
+}
+
+function idxAtPointer(rotationDeg, n){
+  const rot=((rotationDeg%360)+360)%360;
+  const slice=360/n;
+  const a=(360 - rot + (slice/2))%360;
+  return Math.floor(a/slice)%n;
+}
+
+function lock(lock){
+  spin19Btn.disabled=lock;
+  spin4Btn.disabled=lock;
+}
+
+function spinWheel({canvasEl, labels, isBannedFn, durationMs, minTurns, maxTurns, onTick, onResult}){
+  const n=labels.length;
+  const available=[];
+  for(let i=0;i<n;i++) if(!isBannedFn(i)) available.push(i);
+  if(available.length===0) return;
+
+  const targetIdx=available[Math.floor(Math.random()*available.length)];
+  const startRot=canvasEl._rot ?? 0;
+  const turns=Math.floor(Math.random()*(maxTurns-minTurns+1))+minTurns;
+
+  const baseRot=startRot + turns*360;
+  let endRot=baseRot;
+  for(let k=0;k<720;k++){
+    const tryRot=baseRot+k;
+    if(idxAtPointer(tryRot,n)===targetIdx){ endRot=tryRot; break; }
+  }
+
+  const start=performance.now();
+  const easeOutCubic=t=>1-Math.pow(1-t,3);
+  let lastIdx=idxAtPointer(startRot,n);
+
+  function frame(now){
+    const t=Math.min(1,(now-start)/durationMs);
+    const rot=startRot + (endRot-startRot)*easeOutCubic(t);
+    canvasEl._rot=rot;
+    canvasEl.style.transform=`rotate(${rot}deg)`;
+
+    const idx=idxAtPointer(rot,n);
+    if(idx!==lastIdx){
+      lastIdx=idx;
+      onTick?.(labels[idx], idx);
+    }
+
+    if(t<1) requestAnimationFrame(frame);
+    else onResult?.(labels[targetIdx], targetIdx);
+  }
+  requestAnimationFrame(frame);
+}
+
+function redrawAll(){
+  drawWheel(wheel19, CLASSES, {
+    isBanned:(i)=>banned.has(i),
+    colors:["rgba(215,178,91,.90)","rgba(70,150,95,.88)","rgba(180,80,40,.84)","rgba(90,140,170,.84)"],
+    labelScale:0.92
+  });
+  drawWheel(wheel4, ELEMENTS, {
+    isBanned:()=>false,
+    colors:["rgba(220,80,60,.92)","rgba(70,140,210,.90)","rgba(185,225,120,.90)","rgba(190,150,80,.92)"],
+    labelScale:1.45,
+    textColor:"rgba(10,7,4,.92)"
+  });
+  const left=CLASSES.length-banned.size;
+  countLeft.textContent=`${left} dispo`;
+}
+
+function renderBanList(){
+  banList.innerHTML="";
+  CLASSES.forEach((name,i)=>{
+    const row=document.createElement("div");
+    row.className="banItem"+(banned.has(i)?" banned":"");
+    const left=document.createElement("div");
+    left.innerHTML=`<div class="name">${name}</div><div class="meta">${banned.has(i)?"Bannie":"Disponible"}</div>`;
+    const btn=document.createElement("button");
+    btn.textContent=banned.has(i)?"Unban":"Ban";
+    btn.onclick=()=>{
+      if(banned.has(i)) banned.delete(i); else banned.add(i);
+      renderBanList();
+      redrawAll();
+    };
+    row.append(left,btn);
+    banList.append(row);
+  });
+}
+
+redrawAll();
+renderBanList();
+
+spin19Btn.addEventListener("click", ()=>{
+  lock(true);
+  ensureAudio();
+
+  spinWheel({
+    canvasEl: wheel19,
+    labels: CLASSES,
+    isBannedFn: (i)=>banned.has(i),
+    durationMs: 4400,
+    minTurns: 7,
+    maxTurns: 11,
+    onTick: (label)=>{
+      if(!tickSound.checked) return;
+      playTone(hashToFreq(label, 170), 40, "square", 0.022);
+    },
+    onResult: (label)=>{
+      pickedClass.textContent=label;
+      if(resultSound.checked){
+        const f=hashToFreq(label, 240);
+        playTone(f, 140, "triangle", 0.05);
+        setTimeout(()=>playTone(f+220, 90, "sine", 0.038), 90);
+      }
+      lock(false);
+    }
+  });
+});
+
+spin4Btn.addEventListener("click", ()=>{
+  lock(true);
+  ensureAudio();
+
+  spinWheel({
+    canvasEl: wheel4,
+    labels: ELEMENTS,
+    isBannedFn: ()=>false,
+    durationMs: 2600,
+    minTurns: 5,
+    maxTurns: 8,
+    onTick: (label)=>{
+      if(!tickSound.checked) return;
+      const base={Feu:280,Eau:240,Air:340,Terre:200}[label] ?? 260;
+      playTone(base, 45, "sine", 0.03);
+    },
+    onResult: (label)=>{
+      pickedElem.textContent=label;
+      if(resultSound.checked){
+        const base={Feu:360,Eau:290,Air:420,Terre:240}[label] ?? 320;
+        playTone(base, 120, "triangle", 0.05);
+      }
+      lock(false);
+    }
+  });
+});
+</script>
+
+</body>
+</html>
